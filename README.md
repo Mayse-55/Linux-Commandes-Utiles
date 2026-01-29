@@ -1214,7 +1214,3 @@ Selon les conditions suivantes :
 - Attribution : Vous devez créditer l'œuvre, intégrer un lien vers la licence et indiquer si des modifications ont été effectuées
 
 © 2026 Nathaël Polnecq
-
----
-
-**Dernière mise à jour :** Janvier 2026
