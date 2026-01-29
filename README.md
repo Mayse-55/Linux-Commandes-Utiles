@@ -589,6 +589,40 @@ chmod o+r fichier         # Ajouter lecture pour others
 chmod a+x script          # Ajouter exécution pour all
 chmod -R 755 dossier/     # Récursif
 
+# Table complète des permissions numériques
+# Calcul : r=4, w=2, x=1 (addition pour combiner)
+#
+# Propriétaire | Groupe | Autres | Usage typique
+# -------------|--------|--------|------------------------------------------
+chmod 777      # rwxrwxrwx | Tous les droits (dangereux, à éviter)
+chmod 755      # rwxr-xr-x | Scripts, binaires, dossiers publics
+chmod 750      # rwxr-x--- | Scripts/dossiers accessibles au groupe uniquement
+chmod 700      # rwx------ | Fichiers/dossiers privés de l'utilisateur
+chmod 666      # rw-rw-rw- | Fichiers modifiables par tous (rare)
+chmod 664      # rw-rw-r-- | Fichiers partagés en groupe
+chmod 644      # rw-r--r-- | Fichiers de configuration, documents
+chmod 640      # rw-r----- | Logs, fichiers sensibles lisibles par groupe
+chmod 600      # rw------- | Clés SSH, mots de passe, fichiers très sensibles
+chmod 555      # r-xr-xr-x | Fichiers exécutables en lecture seule
+chmod 444      # r--r--r-- | Fichiers en lecture seule pour tous
+chmod 400      # r-------- | Fichiers confidentiels en lecture seule
+chmod 000      # --------- | Aucun accès (même root peut y accéder)
+
+# Détail du calcul
+# r (read)    = 4
+# w (write)   = 2
+# x (execute) = 1
+#
+# Exemples de calcul :
+# rwx = 4+2+1 = 7
+# rw- = 4+2+0 = 6
+# r-x = 4+0+1 = 5
+# r-- = 4+0+0 = 4
+# -wx = 0+2+1 = 3
+# -w- = 0+2+0 = 2
+# --x = 0+0+1 = 1
+# --- = 0+0+0 = 0
+
 # Changement de propriétaire (chown)
 chown user fichier
 chown user:group fichier
