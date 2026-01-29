@@ -1202,17 +1202,6 @@ help commande             # Pour les commandes intégrées bash
 
 ---
 
-## Contribuer
-
-Cette documentation est maintenue sur GitHub. Les contributions sont les bienvenues :
-
-- Signaler des erreurs
-- Proposer des améliorations
-- Ajouter des commandes manquantes
-- Traduire dans d'autres langues
-
----
-
 ## Licence
 
 Cette documentation est sous licence [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.fr).
