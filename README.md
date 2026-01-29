@@ -479,6 +479,65 @@ DNS1=8.8.8.8
 systemctl restart NetworkManager
 ```
 
+### Date et heure
+
+```bash
+# Vérifier l'heure actuelle
+date
+timedatectl
+timedatectl status
+
+# Lister les fuseaux horaires
+timedatectl list-timezones
+timedatectl list-timezones | grep Paris
+timedatectl list-timezones | grep Europe
+
+# Configurer le fuseau horaire
+timedatectl set-timezone Europe/Paris      # France (UTC+1/+2)
+timedatectl set-timezone Europe/Brussels   # Belgique
+timedatectl set-timezone Europe/Zurich     # Suisse
+timedatectl set-timezone America/New_York  # New York
+timedatectl set-timezone Asia/Tokyo        # Tokyo
+
+# Activer la synchronisation NTP automatique
+timedatectl set-ntp true
+
+# Désactiver NTP (si besoin de définir manuellement)
+timedatectl set-ntp false
+
+# Définir l'heure manuellement
+timedatectl set-time "2026-01-29 14:30:00"
+timedatectl set-time "14:30:00"            # Seulement l'heure
+timedatectl set-time "2026-01-29"          # Seulement la date
+
+# Synchronisation avec systemd-timesyncd
+systemctl status systemd-timesyncd
+systemctl restart systemd-timesyncd
+systemctl enable systemd-timesyncd
+
+# Méthode avec NTP (serveur dédié)
+apt install ntp                            # Debian/Ubuntu
+dnf install ntp                            # Fedora/RHEL
+systemctl start ntp
+systemctl enable ntp
+ntpq -p                                    # Vérifier les serveurs NTP
+
+# Synchronisation immédiate
+apt install ntpdate                        # Si pas installé
+ntpdate pool.ntp.org
+ntpdate fr.pool.ntp.org
+ntpdate time.google.com
+
+# Horloge matérielle (BIOS)
+hwclock                                    # Lire l'horloge matérielle
+hwclock --systohc                          # Synchroniser système vers matériel
+hwclock --hctosys                          # Synchroniser matériel vers système
+
+# Méthode alternative (ancienne)
+dpkg-reconfigure tzdata                    # Interface interactive
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+```
+
 ### Pare-feu
 
 ```bash
