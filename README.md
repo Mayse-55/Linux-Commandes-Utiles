@@ -1,4 +1,4 @@
-# Mini Documentation Linux – Commandes utiles (du simple au plus avancé)
+# Linux – Commandes utiles
 
 ---
 
