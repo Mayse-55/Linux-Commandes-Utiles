@@ -23,12 +23,13 @@ Documentation complète des commandes essentielles pour l'administration systèm
 4. [Recherche et filtrage](#recherche-et-filtrage)
 5. [Gestion des disques](#gestion-des-disques)
 6. [Configuration réseau](#configuration-réseau)
-7. [Gestion des processus](#gestion-des-processus)
-8. [Permissions et utilisateurs](#permissions-et-utilisateurs)
-9. [Gestion des services](#gestion-des-services)
-10. [Surveillance système](#surveillance-système)
-11. [Personnalisation du shell](#personnalisation-du-shell)
-12. [Commandes avancées](#commandes-avancées)
+7. [Date et heure](#date-et-heure)
+8. [Gestion des processus](#gestion-des-processus)
+9. [Permissions et utilisateurs](#permissions-et-utilisateurs)
+10. [Gestion des services](#gestion-des-services)
+11. [Surveillance système](#surveillance-système)
+12. [Personnalisation du shell](#personnalisation-du-shell)
+13. [Commandes avancées](#commandes-avancées)
 
 ---
 
@@ -479,18 +480,30 @@ DNS1=8.8.8.8
 systemctl restart NetworkManager
 ```
 
-### Date et heure
+---
+
+## Date et heure
+
+### Vérification
 
 ```bash
-# Vérifier l'heure actuelle
+# Afficher l'heure actuelle
 date
 timedatectl
 timedatectl status
 
-# Lister les fuseaux horaires
+# Afficher l'horloge matérielle (BIOS)
+hwclock
+```
+
+### Configuration du fuseau horaire
+
+```bash
+# Lister les fuseaux horaires disponibles
 timedatectl list-timezones
 timedatectl list-timezones | grep Paris
 timedatectl list-timezones | grep Europe
+timedatectl list-timezones | grep America
 
 # Configurer le fuseau horaire
 timedatectl set-timezone Europe/Paris      # France (UTC+1/+2)
@@ -498,47 +511,103 @@ timedatectl set-timezone Europe/Brussels   # Belgique
 timedatectl set-timezone Europe/Zurich     # Suisse
 timedatectl set-timezone America/New_York  # New York
 timedatectl set-timezone Asia/Tokyo        # Tokyo
+timedatectl set-timezone UTC               # Temps universel
 
-# Activer la synchronisation NTP automatique
+# Méthode alternative (ancienne)
+dpkg-reconfigure tzdata                    # Interface interactive Debian/Ubuntu
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+```
+
+### Synchronisation NTP
+
+```bash
+# Activer la synchronisation automatique (systemd-timesyncd)
 timedatectl set-ntp true
-
-# Désactiver NTP (si besoin de définir manuellement)
-timedatectl set-ntp false
-
-# Définir l'heure manuellement
-timedatectl set-time "2026-01-29 14:30:00"
-timedatectl set-time "14:30:00"            # Seulement l'heure
-timedatectl set-time "2026-01-29"          # Seulement la date
-
-# Synchronisation avec systemd-timesyncd
 systemctl status systemd-timesyncd
 systemctl restart systemd-timesyncd
 systemctl enable systemd-timesyncd
 
-# Méthode avec NTP (serveur dédié)
+# Désactiver NTP (pour définir l'heure manuellement)
+timedatectl set-ntp false
+
+# Installation et configuration NTP (serveur dédié)
 apt install ntp                            # Debian/Ubuntu
-dnf install ntp                            # Fedora/RHEL
-systemctl start ntp
+dnf install ntp chrony                     # Fedora/RHEL
+pacman -S ntp                              # Arch
+
+# Configuration NTP
+nano /etc/ntp.conf
+# Serveurs NTP recommandés :
+# pool 0.fr.pool.ntp.org iburst
+# pool 1.fr.pool.ntp.org iburst
+# pool 2.fr.pool.ntp.org iburst
+
+systemctl restart ntp
 systemctl enable ntp
 ntpq -p                                    # Vérifier les serveurs NTP
+ntpstat                                    # Statut de synchronisation
 
 # Synchronisation immédiate
 apt install ntpdate                        # Si pas installé
 ntpdate pool.ntp.org
 ntpdate fr.pool.ntp.org
 ntpdate time.google.com
-
-# Horloge matérielle (BIOS)
-hwclock                                    # Lire l'horloge matérielle
-hwclock --systohc                          # Synchroniser système vers matériel
-hwclock --hctosys                          # Synchroniser matériel vers système
-
-# Méthode alternative (ancienne)
-dpkg-reconfigure tzdata                    # Interface interactive
-ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+ntpdate 0.fr.pool.ntp.org
 ```
 
-### Pare-feu
+### Configuration manuelle
+
+```bash
+# Définir l'heure manuellement
+timedatectl set-time "2026-01-29 14:30:00"
+timedatectl set-time "14:30:00"            # Seulement l'heure
+timedatectl set-time "2026-01-29"          # Seulement la date
+
+# Méthode alternative
+date -s "2026-01-29 14:30:00"
+date --set="2026-01-29 14:30:00"
+```
+
+### Horloge matérielle
+
+```bash
+# Lire l'horloge matérielle (RTC - Real Time Clock)
+hwclock
+hwclock -r
+
+# Synchroniser système vers matériel
+hwclock --systohc
+hwclock -w
+
+# Synchroniser matériel vers système
+hwclock --hctosys
+hwclock -s
+
+# Définir l'horloge matérielle manuellement
+hwclock --set --date="2026-01-29 14:30:00"
+```
+
+### Problèmes courants
+
+```bash
+# Serveur en UTC alors que vous êtes en UTC+1
+timedatectl set-timezone Europe/Paris      # Solution simple
+
+# Vérifier si le serveur est en UTC
+timedatectl | grep "Time zone"
+
+# Forcer la synchronisation immédiate
+systemctl stop systemd-timesyncd
+ntpdate pool.ntp.org
+systemctl start systemd-timesyncd
+
+# Drift important de l'horloge
+hwclock --systohc                          # Synchroniser le BIOS
+```
+
+---
+
+## Gestion des processus
 
 ```bash
 # UFW (Ubuntu)
